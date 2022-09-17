@@ -66,12 +66,16 @@ public class GuestLogin : MonoBehaviour
             }
         }
         if((string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(domainKey))) {
-            Debug.LogError("Can't run because no api key or domain key supplied");
-            return;
+            if(!LootLockerSDKManager.CheckInitialized(true)) {
+                Debug.LogError("Can't run because no api key or domain key supplied");
+                return;
+            }
+        } else {
+            
+            Debug.Log("Making log in request with apiKey: " + apiKey + " and domainKey: " + domainKey);
+            LootLockerSDKManager.Init(apiKey, "0.0.0.1", LootLocker.LootLockerConfig.platformType.Android, true, domainKey);
+            LootLocker.LootLockerConfig.current.currentDebugLevel = LootLocker.LootLockerConfig.DebugLevel.All;
         }
-        Debug.Log("Making log in request with apiKey: " + apiKey + " and domainKey: " + domainKey);
-        LootLockerSDKManager.Init(apiKey, "0.0.0.1", LootLocker.LootLockerConfig.platformType.Android, true, domainKey);
-        LootLocker.LootLockerConfig.current.currentDebugLevel = LootLocker.LootLockerConfig.DebugLevel.All;
     }
 
     public bool isDone() {
