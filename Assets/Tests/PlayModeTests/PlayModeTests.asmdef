@@ -3,7 +3,8 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "GuestLoginAssembly"
+        "GuestLoginAssembly",
+        "lootlocker.lootlockersdk.runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
