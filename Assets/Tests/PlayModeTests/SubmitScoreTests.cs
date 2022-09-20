@@ -19,8 +19,8 @@ namespace Tests
             var sdkPortal = guestLoginGO.AddComponent<SDKPortal>();
 
             // Wait for SDK Init
-            yield return new WaitUntil(() => guestLogin.isDone());
-            Assert.IsTrue(guestLogin.isLoggedIn());
+            yield return new WaitUntil(() => guestLogin.IsDone());
+            Assert.IsTrue(guestLogin.IsLoggedIn());
 
             // When
             int responsesReceived = 0;
@@ -29,15 +29,15 @@ namespace Tests
                     for(int useLeaderboardId = 0; useLeaderboardId <= 1; useLeaderboardId++) {
                         var expectedPlayer = leaderboard.isPlayerType ? players[0] : player;
                         //By leaderboard id
-                        sdkPortal.submitScore(player.memberId, player.score, leaderboard.id, player.metadata, (response) => {
+                        sdkPortal.SubmitScore(player.memberId, player.score, leaderboard.id, player.metadata, (response) => {
                             // Then
-                            assertResponse(leaderboard, expectedPlayer, response);
+                            AssertResponse(leaderboard, expectedPlayer, response);
                             responsesReceived++;
                         });
                         //By leaderboard key
-                        sdkPortal.submitScore(player.memberId, player.score, leaderboard.key, player.metadata, (response) => {
+                        sdkPortal.SubmitScore(player.memberId, player.score, leaderboard.key, player.metadata, (response) => {
                             // Then
-                            assertResponse(leaderboard, expectedPlayer, response);
+                            AssertResponse(leaderboard, expectedPlayer, response);
                             responsesReceived++;
                         });
                     }
@@ -46,7 +46,7 @@ namespace Tests
             yield return new WaitUntil(() => responsesReceived >= responsesExpected);
         }
 
-        private void assertResponse(LeaderboardId expectedLeaderboard, LeaderBoardPlayer expectedPlayer, LootLockerSubmitScoreResponse response) {
+        private void AssertResponse(LeaderboardId expectedLeaderboard, LeaderBoardPlayer expectedPlayer, LootLockerSubmitScoreResponse response) {
             string combo = "board " + expectedLeaderboard.name + " and player " + expectedPlayer.memberId;
             Assert.AreEqual(200, response.statusCode, "Response code wrong for " + combo);
             Assert.AreEqual(expectedPlayer.score, response.score, "Wrong score returned for " + combo);

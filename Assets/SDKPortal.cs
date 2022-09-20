@@ -6,12 +6,12 @@ using LootLocker.Requests;
 
 public class SDKPortal : MonoBehaviour
 {
-    public void submitScore(string memberId, int score, string leaderBoardKey, string metadata, Action<LootLockerSubmitScoreResponse> onComplete) {
+    public void SubmitScore(string memberId, int score, string leaderBoardKey, string metadata, Action<LootLockerSubmitScoreResponse> onComplete) {
         LootLockerSDKManager.SubmitScore(memberId, score, leaderBoardKey, metadata, onComplete);
     }
 
     
-    public void submitScore(string memberId, int score, int leaderBoardId, string metadata, Action<LootLockerSubmitScoreResponse> onComplete) {
+    public void SubmitScore(string memberId, int score, int leaderBoardId, string metadata, Action<LootLockerSubmitScoreResponse> onComplete) {
         LootLockerSDKManager.SubmitScore(memberId, score, leaderBoardId, metadata, onComplete);
     }
 

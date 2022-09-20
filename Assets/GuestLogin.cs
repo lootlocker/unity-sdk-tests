@@ -14,10 +14,10 @@ public class GuestLogin : MonoBehaviour
     
     void Start()
     {
-        login("Start");
+        Login("Start");
     }
 
-    public void login(string source) {
+    public void Login(string source) {
         if(mIsLoggedIn || mIsRequestInProgress) {
             Debug.Log("Not in a state to log in, skipping login request from " + source);
             return;
@@ -26,7 +26,7 @@ public class GuestLogin : MonoBehaviour
         
         mIsRequestDone = false;
         mIsRequestInProgress = true;
-        initSDK();
+        InitSDK();
 
         LootLockerSDKManager.StartGuestSession((response) =>
         {
@@ -47,7 +47,7 @@ public class GuestLogin : MonoBehaviour
         });
     }
 
-    private void initSDK() {
+    private void InitSDK() {
         string[] args = System.Environment.GetCommandLineArgs ();
         for(int i = 0; i < args.Length; i++) {
             if(args[i] == "-apikey") {
@@ -69,15 +69,15 @@ public class GuestLogin : MonoBehaviour
         }
     }
 
-    public bool isDone() {
+    public bool IsDone() {
         return mIsRequestDone;
     }
 
-    public bool isLoggedIn() {
+    public bool IsLoggedIn() {
         return mIsLoggedIn;
     }
 
-    public int getPlayerId() {
+    public int GetPlayerId() {
         return mPlayerId;
     }
 }
