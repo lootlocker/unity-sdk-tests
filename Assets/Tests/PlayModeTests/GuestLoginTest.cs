@@ -13,9 +13,9 @@ namespace Tests
         {
             var guestLoginGO = new GameObject();
             var guestLogin = guestLoginGO.AddComponent<GuestLogin>();
-            yield return new WaitUntil(() => guestLogin.isDone());
-            Assert.IsTrue(guestLogin.isLoggedIn());
-            Assert.IsTrue(guestLogin.getPlayerId() != 0);
+            yield return new WaitUntil(() => guestLogin.IsDone());
+            Assert.IsTrue(guestLogin.IsLoggedIn());
+            Assert.IsTrue(guestLogin.GetPlayerId() != 0);
         }
     }
 }
