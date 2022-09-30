@@ -26,35 +26,41 @@ namespace Tests
             int responsesReceived = 0;
             foreach (var leaderboard in leaderboards) {
                 foreach (var player in players) {
-                    for(int useLeaderboardId = 0; useLeaderboardId <= 1; useLeaderboardId++) {
-                        var expectedPlayer = leaderboard.isPlayerType ? players[0] : player;
-                        //By leaderboard id
-                        sdkPortal.SubmitScore(player.memberId, player.score, leaderboard.id, player.metadata, (response) => {
-                            // Then
-                            AssertResponse(leaderboard, expectedPlayer, response);
-                            responsesReceived++;
-                        });
-                        //By leaderboard key
-                        sdkPortal.SubmitScore(player.memberId, player.score, leaderboard.key, player.metadata, (response) => {
-                            // Then
-                            AssertResponse(leaderboard, expectedPlayer, response);
-                            responsesReceived++;
-                        });
-                    }
+                    var expectedPlayer = leaderboard.isPlayerType ? players[0] : player;
+                    int responsesExpectedLocal = responsesReceived+=2;
+                    //By leaderboard id
+                    sdkPortal.SubmitScore(player.memberId, player.score, leaderboard.id, player.metadata, (response) => {
+                        // Then
+                        responsesReceived++;
+                        AssertResponse(leaderboard, expectedPlayer, response);
+                    });
+                    //By leaderboard key
+                    sdkPortal.SubmitScore(player.memberId, player.score, leaderboard.key, player.metadata, (response) => {
+                        // Then
+                        responsesReceived++;
+                        AssertResponse(leaderboard, expectedPlayer, response);
+                    });
+                    yield return new WaitUntil(() => {
+                        return responsesReceived >= responsesExpectedLocal;
+                    });
                 }
             }
-            yield return new WaitUntil(() => responsesReceived >= responsesExpected);
+            yield return new WaitUntil(() => {
+                return responsesReceived >= responsesExpected;
+            });
         }
 
         private void AssertResponse(LeaderboardId expectedLeaderboard, LeaderBoardPlayer expectedPlayer, LootLockerSubmitScoreResponse response) {
             string combo = "board " + expectedLeaderboard.name + " and player " + expectedPlayer.memberId;
-            Assert.AreEqual(200, response.statusCode, "Response code wrong for " + combo);
-            Assert.AreEqual(expectedPlayer.score, response.score, "Wrong score returned for " + combo);
+            Assert.AreEqual(200, response.statusCode, "Response code wrong for " + combo + " expected " + 200 + " but was " + response.statusCode);
+            Assert.AreEqual(expectedPlayer.score, response.score, "Wrong score returned for " + combo + " expected " + expectedPlayer.score + " but was " + response.score);
             Assert.IsTrue(!string.IsNullOrEmpty(response.member_id), "No member id returned for " + combo);
-            Assert.AreEqual(expectedPlayer.rank, response.rank, "Wrong rank returned for " + combo);
+            if(!expectedLeaderboard.isPlayerType) {
+                Assert.AreEqual(expectedPlayer.rank, response.rank, "Wrong rank returned for " + combo + " expected " + expectedPlayer.rank + " but was " + response.rank);
+            }
 
             if (expectedLeaderboard.hasMetadata) {
-                Assert.AreEqual(expectedPlayer.metadata, response.metadata, "Wrong metadata returned for " + combo);
+                Assert.AreEqual(expectedPlayer.metadata, response.metadata, "Wrong metadata returned for " + combo + " expected " + expectedPlayer.metadata + " but was " + response.metadata);
             } else {
                 Assert.IsTrue(string.IsNullOrEmpty(response.metadata), "Metadata returned for non metadata leaderboard " + combo);
             }
@@ -62,17 +68,17 @@ namespace Tests
 
         // TEST DATA
         private LeaderBoardPlayer[] players = new LeaderBoardPlayer[] {
-            new LeaderBoardPlayer("p1", 1337,   1, "MetadataForPlayer1"),
-            new LeaderBoardPlayer("p2", 1336,   2, "MetadataForPlayer2"),
-            new LeaderBoardPlayer("p3", 1335,   3, "MetadataForPlayer3"),
-            new LeaderBoardPlayer("p4", 1334,   4, "MetadataForPlayer4"),
-            new LeaderBoardPlayer("p5", 1333,   5, "MetadataForPlayer5"),
-            new LeaderBoardPlayer("p6", 1332,   7, "MetadataForPlayer6"),
-            new LeaderBoardPlayer("p7", 1332,   6, "MetadataForPlayer7"),
-            new LeaderBoardPlayer("p8", 900,    8, "MetadataForPlayer8"),
-            new LeaderBoardPlayer("p9", 24,     9, "MetadataForPlayer9"),
-            new LeaderBoardPlayer("p10",13,     10, "MetadataForPlayer10"),
-            new LeaderBoardPlayer("p11",1,      11, "MetadataForPlayer11"),
+            new LeaderBoardPlayer("p1",     1337,   1, "MetadataForPlayer1"),
+            new LeaderBoardPlayer("p2",     1336,   2, "MetadataForPlayer2"),
+            new LeaderBoardPlayer("p3",     1335,   3, "MetadataForPlayer3"),
+            new LeaderBoardPlayer("p4",     1334,   4, "MetadataForPlayer4"),
+            new LeaderBoardPlayer("p5",     1333,   5, "MetadataForPlayer5"),
+            new LeaderBoardPlayer("p6",     1332,   7, "MetadataForPlayer6"),
+            new LeaderBoardPlayer("p7",     1332,   6, "MetadataForPlayer7"),
+            new LeaderBoardPlayer("p8",     900,    8, "MetadataForPlayer8"),
+            new LeaderBoardPlayer("p9",     24,     9, "MetadataForPlayer9"),
+            new LeaderBoardPlayer("p10",    13,     10, "MetadataForPlayer10"),
+            new LeaderBoardPlayer("p11",    1,      11, "MetadataForPlayer11"),
         };
 
         private LeaderboardId[] leaderboards = new LeaderboardId[] {
