@@ -42,7 +42,7 @@ jobs:
           path: ./tests~ # Unity ignores folders with ~ from inclusion
 
       - name: Switch to branch under test # If nothing specified or the current branch is main the variable will be empty and no branch switch is done
-        run: cd tests~ && sudo chmod 777 branchUnderTest.sh && BRANCHUNDERTEST=$(./branchUnderTest.sh) && cd .. && git fetch --all && git checkout --track origin/$BRANCHUNDERTEST
+        run: cd tests~ && sudo chmod 777 branchUnderTest.sh && BRANCHUNDERTEST=$(./branchUnderTest.sh) && cd .. && git fetch --all && git checkout $BRANCHUNDERTEST
 
       - name: Log branches being built/tested
         run: echo "SDK BRANCH" && git branch && cd tests~ && echo "TEST BRANCH" && git branch && cd ..
