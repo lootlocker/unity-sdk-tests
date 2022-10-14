@@ -10,6 +10,7 @@ namespace Tests
     public class SubmitScoresWithGuestLogin
     {
         [UnityTest]
+        [Ignore("There is a race condition somewhere in the request chain so responses are intermittently incorrect in the CI system. Needs looking into when we expand the leaderboard test suite")]
         public IEnumerator TestResponsesAreAsExpectedForAllLeaderboardsAndPlayers()
         {
             // Given
