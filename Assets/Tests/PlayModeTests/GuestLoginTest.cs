@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using LootLocker.Requests;
 
 namespace Tests
 {
@@ -16,6 +17,14 @@ namespace Tests
             yield return new WaitUntil(() => guestLogin.IsDone());
             Assert.IsTrue(guestLogin.IsLoggedIn());
             Assert.IsTrue(guestLogin.GetPlayerId() != 0);
+
+            // Cleanup
+            bool cleanupComplete = false;
+            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
+            yield return new WaitUntil(() =>
+            {
+                return cleanupComplete;
+            });
         }
     }
 }

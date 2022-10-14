@@ -16,7 +16,6 @@ namespace Tests
             int responsesExpected = 2 * players.Length * leaderboards.Length;
             var guestLoginGO = new GameObject();
             var guestLogin = guestLoginGO.AddComponent<GuestLogin>();
-            var sdkPortal = guestLoginGO.AddComponent<SDKPortal>();
 
             // Wait for SDK Init
             yield return new WaitUntil(() => guestLogin.IsDone());
@@ -27,18 +26,22 @@ namespace Tests
             foreach (var leaderboard in leaderboards) {
                 foreach (var player in players) {
                     var expectedPlayer = leaderboard.isPlayerType ? players[0] : player;
-                    int responsesExpectedLocal = responsesReceived+=2;
+                    int responsesExpectedLocal = responsesReceived+=1;
                     //By leaderboard id
-                    sdkPortal.SubmitScore(player.memberId, player.score, leaderboard.id, player.metadata, (response) => {
+                    LootLockerSDKManager.SubmitScore(player.memberId, player.score, leaderboard.id, player.metadata, (response) => {
                         // Then
-                        responsesReceived++;
                         AssertResponse(leaderboard, expectedPlayer, response);
+                        responsesReceived++;
                     });
+                    yield return new WaitUntil(() => {
+                        return responsesReceived >= responsesExpectedLocal;
+                    });
+                    responsesExpectedLocal = responsesReceived += 1;
                     //By leaderboard key
-                    sdkPortal.SubmitScore(player.memberId, player.score, leaderboard.key, player.metadata, (response) => {
+                    LootLockerSDKManager.SubmitScore(player.memberId, player.score, leaderboard.key, player.metadata, (response) => {
                         // Then
-                        responsesReceived++;
                         AssertResponse(leaderboard, expectedPlayer, response);
+                        responsesReceived++;
                     });
                     yield return new WaitUntil(() => {
                         return responsesReceived >= responsesExpectedLocal;
@@ -47,6 +50,14 @@ namespace Tests
             }
             yield return new WaitUntil(() => {
                 return responsesReceived >= responsesExpected;
+            });
+
+            // Cleanup
+            bool cleanupComplete = false;
+            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
+            yield return new WaitUntil(() =>
+            {
+                return cleanupComplete;
             });
         }
 
