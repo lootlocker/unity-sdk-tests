@@ -119,61 +119,6 @@ namespace Tests
         }
 
         [UnityTest]
-        public IEnumerator WhiteLabelSessionStartFromEmailPasswordComboSucceeds()
-        {
-            // Prerequisite
-            bool loginResponseReceived = false;
-            bool loggedIn = false;
-            LootLockerSDKManager.WhiteLabelLogin(WL_UNVERIFIED_USER_EMAIL, WL_UNVERIFIED_USER_PASSWORD, false, loginResponse =>
-            {
-                loggedIn = loginResponse.success;
-                loginResponseReceived = true;
-            });
-
-            yield return new WaitUntil(() =>
-            {
-                return loginResponseReceived;
-            });
-            Assert.IsTrue(loggedIn, "Prerequisite login failed");
-
-            // Given
-            int actualStatusCode = -1;
-            int expectedStatusCode = 200;
-            string actualSessionToken = null;
-            int actualSessionPlayerId = -1;
-
-            // When
-            LootLockerSDKManager.StartWhiteLabelSession(WL_UNVERIFIED_USER_EMAIL, WL_UNVERIFIED_USER_PASSWORD, (startSessionResponse) =>
-            {
-                actualStatusCode = startSessionResponse.statusCode;
-                if (startSessionResponse.success)
-                {
-                    actualSessionPlayerId = startSessionResponse.player_id;
-                    actualSessionToken = startSessionResponse.session_token;
-                }
-            });
-
-            // Wait for response
-            yield return new WaitUntil(() =>
-            {
-                return actualStatusCode >= 0;
-            });
-
-            // Then
-            Assert.AreEqual(expectedStatusCode, actualStatusCode, "Start session failed, status code not 200");
-            Assert.IsTrue(actualSessionPlayerId >= 0, "Session player id is unexpected, expected positive integer but got " + actualSessionPlayerId);
-            Assert.IsTrue(!string.IsNullOrEmpty(actualSessionToken), "Session token is null or empty");
-
-            // Cleanup
-            bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
-            {
-                return cleanupComplete;
-            });
-        }
-
-        [UnityTest]
         public IEnumerator WhiteLabelCheckSessionFailsWhenNoSessionExists()
         {
             // Given
