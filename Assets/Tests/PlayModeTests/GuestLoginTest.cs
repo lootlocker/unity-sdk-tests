@@ -9,6 +9,19 @@ namespace Tests
 {
     public class GuestLoginTest
     {
+        [UnityTearDown]
+        public IEnumerator UnityTearDown()
+        {
+            // Cleanup
+            bool cleanupComplete = false;
+            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
+            yield return new WaitUntil(() =>
+            {
+                return cleanupComplete;
+            });
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator GuestUserCanLogIn()
         {
@@ -17,14 +30,6 @@ namespace Tests
             yield return new WaitUntil(() => guestLogin.IsDone());
             Assert.IsTrue(guestLogin.IsLoggedIn());
             Assert.IsTrue(guestLogin.GetPlayerId() != 0);
-
-            // Cleanup
-            bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
-            {
-                return cleanupComplete;
-            });
         }
     }
 }

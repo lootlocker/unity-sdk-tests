@@ -9,6 +9,19 @@ namespace Tests
 {
     public class SubmitScoresWithGuestLogin
     {
+        [UnityTearDown]
+        public IEnumerator UnityTearDown()
+        {
+            // Cleanup
+            bool cleanupComplete = false;
+            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
+            yield return new WaitUntil(() =>
+            {
+                return cleanupComplete;
+            });
+            yield return null;
+        }
+
         [UnityTest]
         [Ignore("There is a race condition somewhere in the request chain so responses are intermittently incorrect in the CI system. Needs looking into when we expand the leaderboard test suite")]
         public IEnumerator TestResponsesAreAsExpectedForAllLeaderboardsAndPlayers()
@@ -51,14 +64,6 @@ namespace Tests
             }
             yield return new WaitUntil(() => {
                 return responsesReceived >= responsesExpected;
-            });
-
-            // Cleanup
-            bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
-            {
-                return cleanupComplete;
             });
         }
 
