@@ -13,6 +13,19 @@ namespace Tests
         private static string WL_UNVERIFIED_USER_PASSWORD = "MrBeastBoost";
         private static int WL_UNVERIFIED_USER_ID = 6249;
 
+        [UnityTearDown]
+        public IEnumerator UnityTearDown()
+        {
+            // Cleanup
+            bool cleanupComplete = false;
+            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
+            yield return new WaitUntil(() =>
+            {
+                return cleanupComplete;
+            }); 
+            yield return null;
+        }
+
         [UnityTest]
         [Ignore("We need to implement admin api removal of the user after tests to be able to run this continuously")]
         public IEnumerator WhiteLabelSignUpSucceeds()
@@ -44,14 +57,6 @@ namespace Tests
             Assert.AreEqual(expectedStatusCode, actualStatusCode, "White Label SignUp failed, status code not 200");
             Assert.IsTrue(actualId >= 0, "New ID is unexpected, expected positive integer but got " + actualId);
             Assert.IsTrue(!string.IsNullOrEmpty(actualCreatedAt), "CreatedAt timestamp is null or empty");
-
-            // Cleanup
-            bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
-            {
-                return cleanupComplete;
-            });
         }
 
         [UnityTest]
@@ -108,14 +113,6 @@ namespace Tests
             Assert.AreEqual(expectedStatusCode, actualStartSessionStatusCode, "Start session failed, status code not 200");
             Assert.IsTrue(actualSessionPlayerId >= 0, "Session player id is unexpected, expected positive integer but got " + actualSessionPlayerId);
             Assert.IsTrue(!string.IsNullOrEmpty(actualStartSessionSessionToken), "Session token is null or empty");
-
-            // Cleanup
-            bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
-            {
-                return cleanupComplete;
-            });
         }
 
         [UnityTest]
@@ -140,14 +137,6 @@ namespace Tests
 
             // Then
             Assert.IsFalse(actualSessionState, "Session Verified OK despite no session active");
-
-            // Cleanup
-            bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
-            {
-                return cleanupComplete;
-            });
         }
 
         [UnityTest]
@@ -197,14 +186,6 @@ namespace Tests
 
             // Then
             Assert.IsTrue(actualSessionState, "Session Verification failed");
-
-            // Cleanup
-            bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
-            {
-                return cleanupComplete;
-            });
         }
 
         [UnityTest]
@@ -256,14 +237,6 @@ namespace Tests
 
             // Then
             Assert.IsTrue(actualSessionState, "Session Verification failed");
-
-            // Cleanup
-            bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
-            {
-                return cleanupComplete;
-            });
         }
 
         [UnityTest]
@@ -315,14 +288,6 @@ namespace Tests
 
             // Then
             Assert.IsFalse(actualSessionState, "Session Verification failed");
-
-            // Cleanup
-            bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
-            {
-                return cleanupComplete;
-            });
         }
 
         [UnityTest]
@@ -348,14 +313,6 @@ namespace Tests
 
             // Then
             Assert.AreEqual(expectedPasswordResetStatusCode, passwordResetStatusCode, "Password reset failed, status code not 200");
-
-            // Cleanup
-            bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
-            {
-                return cleanupComplete;
-            });
         }
 
         [UnityTest]
@@ -381,14 +338,6 @@ namespace Tests
 
             // Then
             Assert.AreEqual(expectedEmailVerificationStatusCode, emailVerificationResetStatusCode, "Email Verficiation request failed, status code not 200");
-
-            // Cleanup
-            bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
-            {
-                return cleanupComplete;
-            });
         }
     }
 }
