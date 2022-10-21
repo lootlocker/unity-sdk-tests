@@ -11,6 +11,13 @@ namespace Tests
     {
         private static string AUTHORIZATION_CODE = "<Needs to be added manually>";
 
+        [UnitySetUp]
+        public IEnumerator UnitySetUp()
+        {
+            LLTestUtils.InitSDK();
+            yield return null;
+        }
+
         [UnityTearDown]
         public IEnumerator UnityTearDown()
         {
@@ -21,7 +28,6 @@ namespace Tests
             {
                 return cleanupComplete;
             });
-            yield return null;
         }
 
         [UnityTest]
@@ -52,7 +58,6 @@ namespace Tests
         public IEnumerator RefreshAppleSessionWhenSignedInSucceeds()
         {
             // Given
-
             int actualSignInStatusCode = -1;
             int expectedSignInStatusCode = 200;
             string refreshToken = null;

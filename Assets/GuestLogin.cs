@@ -62,8 +62,6 @@ public class GuestLogin : MonoBehaviour
                 return;
             }
         } else {
-            
-            Debug.Log("Making log in request with apiKey: " + mApiKey + " and domainkey: " + mDomainKey);
             LootLockerSDKManager.Init(mApiKey, "0.0.0.1", LootLocker.LootLockerConfig.platformType.Android, true, mDomainKey);
             LootLocker.LootLockerConfig.current.currentDebugLevel = LootLocker.LootLockerConfig.DebugLevel.All;
         }

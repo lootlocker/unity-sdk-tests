@@ -13,6 +13,13 @@ namespace Tests
         private static string WL_UNVERIFIED_USER_PASSWORD = "MrBeastBoost";
         private static int WL_UNVERIFIED_USER_ID = 6249;
 
+        [UnitySetUp]
+        public IEnumerator UnitySetUp()
+        {
+            LLTestUtils.InitSDK();
+            yield return null;
+        }
+
         [UnityTearDown]
         public IEnumerator UnityTearDown()
         {
