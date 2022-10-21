@@ -9,6 +9,13 @@ namespace Tests
 {
     public class SubmitScoresWithGuestLogin
     {
+        [UnitySetUp]
+        public IEnumerator UnitySetUp()
+        {
+            LLTestUtils.InitSDK();
+            yield return null;
+        }
+
         [UnityTearDown]
         public IEnumerator UnityTearDown()
         {
