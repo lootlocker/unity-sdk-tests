@@ -1,14 +1,5 @@
 {
   "dependencies": {
-    "com.lootlocker.lootlockersdk": {
-      "version": "https://github.com/LootLocker/unity-sdk.git",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {
-        "com.unity.nuget.newtonsoft-json": "2.0.0"
-      },
-      "hash": "ad067d50f81361279e810b66c230985dca2a6891"
-    },
     "com.unity.2d.animation": {
       "version": "3.2.18",
       "depth": 0,
@@ -121,13 +112,6 @@
     },
     "com.unity.mathematics": {
       "version": "1.1.0",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.nuget.newtonsoft-json": {
-      "version": "2.0.0",
       "depth": 1,
       "source": "registry",
       "dependencies": {},

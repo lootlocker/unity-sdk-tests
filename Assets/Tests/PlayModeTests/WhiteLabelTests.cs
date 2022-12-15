@@ -9,8 +9,8 @@ namespace Tests
 {
     public class WhiteLabelLoginTests
     {
-        private static string WL_UNVERIFIED_USER_EMAIL = "beast@boost.com";
-        private static string WL_UNVERIFIED_USER_PASSWORD = "MrBeastBoost";
+        private static string WL_UNVERIFIED_USER_EMAIL = "erik+unityci@lootlocker.io";
+        private static string WL_UNVERIFIED_USER_PASSWORD = "12345678";
         private static int WL_UNVERIFIED_USER_ID = 6249;
 
         [UnitySetUp]
