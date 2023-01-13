@@ -125,6 +125,62 @@ namespace Tests
         }
 
         [UnityTest]
+        public IEnumerator WhiteLabelLoginAndStartSessionSucceeds()
+        {
+            // Given
+            int actualLoginPlayerId = -1;
+            int actualSessionPlayerId = -1;
+            string actualLoginVerifiedAt = null;
+            string actualLoginSessionToken = null;
+            string actualStartSessionSessionToken = null;
+            int actualLoginStatusCode = -1;
+            int actualStartSessionStatusCode = -1;
+            int actualSummarizedStatusCode = -1;
+            int expectedStatusCode = 200;
+
+            // When
+            LootLockerSDKManager.WhiteLabelLoginAndStartSession(WL_UNVERIFIED_USER_EMAIL, WL_UNVERIFIED_USER_PASSWORD, false, loginAndStartSessionResponse =>
+            {
+                if (loginAndStartSessionResponse == null) return;
+
+                actualSummarizedStatusCode = loginAndStartSessionResponse.statusCode;
+
+                if (loginAndStartSessionResponse.LoginResponse != null)
+                {
+                    actualLoginPlayerId = loginAndStartSessionResponse.LoginResponse.ID;
+                    actualLoginVerifiedAt = loginAndStartSessionResponse.LoginResponse.VerifiedAt;
+                    actualLoginSessionToken = loginAndStartSessionResponse.LoginResponse.SessionToken;
+                    actualLoginStatusCode = loginAndStartSessionResponse.LoginResponse.statusCode;
+
+                }
+
+                if (loginAndStartSessionResponse.SessionResponse != null)
+                {
+                    actualStartSessionStatusCode = loginAndStartSessionResponse.SessionResponse.statusCode;
+                    actualStartSessionSessionToken = loginAndStartSessionResponse.SessionResponse.session_token; 
+                    actualSessionPlayerId = loginAndStartSessionResponse.SessionResponse.player_id;
+                }
+            });
+
+            // Wait for response
+            yield return new WaitUntil(() =>
+            {
+                return actualLoginStatusCode >= 0 && (actualLoginStatusCode != 200 || actualStartSessionStatusCode >= 0);
+            });
+
+            // Then
+            Assert.AreEqual(actualStartSessionStatusCode > 0 ? actualStartSessionStatusCode : actualLoginStatusCode, actualSummarizedStatusCode, "Latest status code not reflected in meta structure");
+            Assert.AreEqual(expectedStatusCode, actualLoginStatusCode, "Login failed, status code not 200");
+            Assert.IsTrue(actualLoginPlayerId >= 0, "Logged in player id is unexpected, expected positive integer but got " + actualLoginPlayerId);
+            Assert.IsTrue(!string.IsNullOrEmpty(actualLoginSessionToken), "Login session token is null or empty");
+            Assert.IsTrue(string.IsNullOrEmpty(actualLoginVerifiedAt), "Verified at timestamp is set despite user being unverified");
+
+            Assert.AreEqual(expectedStatusCode, actualStartSessionStatusCode, "Start session failed, status code not 200");
+            Assert.IsTrue(actualSessionPlayerId >= 0, "Session player id is unexpected, expected positive integer but got " + actualSessionPlayerId);
+            Assert.IsTrue(!string.IsNullOrEmpty(actualStartSessionSessionToken), "Session token is null or empty");
+        }
+
+        [UnityTest]
         public IEnumerator WhiteLabelCheckSessionFailsWhenNoSessionExists()
         {
             // Given
