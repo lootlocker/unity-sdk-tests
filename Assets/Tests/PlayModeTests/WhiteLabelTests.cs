@@ -7,6 +7,8 @@ using LootLocker.Requests;
 
 namespace Tests
 {
+
+    [Ignore("White label has a temporary rate limit in the backend that causes all tests to fail")]
     public class WhiteLabelLoginTests
     {
         private static string WL_UNVERIFIED_USER_EMAIL = "erik+unityci@lootlocker.io";
