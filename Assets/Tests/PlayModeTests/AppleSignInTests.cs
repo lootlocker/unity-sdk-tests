@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using LootLocker;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -10,11 +10,13 @@ namespace Tests
     public class AppleSignInTests
     {
         private static string AUTHORIZATION_CODE = "<Needs to be added manually>";
+        private static LootLockerConfig.DebugLevel debugLevel;
 
         [UnitySetUp]
         public IEnumerator UnitySetUp()
         {
             LLTestUtils.InitSDK();
+            debugLevel = LootLockerConfig.current.currentDebugLevel;
             yield return null;
         }
 
@@ -22,17 +24,19 @@ namespace Tests
         public IEnumerator UnityTearDown()
         {
             // Cleanup
+            LootLockerConfig.current.currentDebugLevel = debugLevel;
             bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
+            LootLockerSDKManager.EndSession((response) =>
             {
-                return cleanupComplete;
+                cleanupComplete = true;
             });
+            yield return new WaitUntil(() => cleanupComplete);
         }
 
         [UnityTest]
         public IEnumerator RefreshAppleSessionWithInvalidTokenFails()
         {
+            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
             // Given
             int expectedResponseCode = 400;
             int actualResponseCode = -1;
@@ -44,13 +48,11 @@ namespace Tests
             });
 
             // Wait for response
-            yield return new WaitUntil(() =>
-            {
-                return actualResponseCode >= 0;
-            });
+            yield return new WaitUntil(() => actualResponseCode >= 0);
 
             // Then
             Assert.AreEqual(expectedResponseCode, actualResponseCode, "Response code wrong, expected " + expectedResponseCode + " but was " + actualResponseCode);
+            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.All;
         }
 
         [UnityTest]
@@ -124,6 +126,7 @@ namespace Tests
         [UnityTest]
         public IEnumerator StartAppleSessionWithInvalidAuthorizationCodeFails()
         {
+            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
             // Given
             int actualSignInStatusCode = -1;
             int expectedSignInStatusCode = 400;
@@ -134,10 +137,7 @@ namespace Tests
                 actualSignInStatusCode = response.statusCode;
             });
 
-            yield return new WaitUntil(() =>
-            {
-                return actualSignInStatusCode >= 0;
-            });
+            yield return new WaitUntil(() => actualSignInStatusCode >= 0);
 
             // Then
             Assert.AreEqual(expectedSignInStatusCode, actualSignInStatusCode, "Failed Sign In");

@@ -49,7 +49,7 @@ namespace Tests
                     var expectedPlayer = leaderboard.isPlayerType ? players[0] : player;
                     int responsesExpectedLocal = responsesReceived+=1;
                     //By leaderboard id
-                    LootLockerSDKManager.SubmitScore(player.memberId, player.score, leaderboard.id, player.metadata, (response) => {
+                    LootLockerSDKManager.SubmitScore(player.memberId, player.score, leaderboard.key, player.metadata, (response) => {
                         // Then
                         AssertResponse(leaderboard, expectedPlayer, response);
                         responsesReceived++;

@@ -40,7 +40,7 @@ public class GuestLogin : MonoBehaviour
             }
             else
             {
-                Debug.Log("Error: " + response.Error);
+                Debug.LogError("Error: " + response.Error);
                 mIsRequestDone = true;
                 mIsRequestInProgress = false;
             }
@@ -62,7 +62,7 @@ public class GuestLogin : MonoBehaviour
                 return;
             }
         } else {
-            LootLockerSDKManager.Init(mApiKey, "0.0.0.1", LootLocker.LootLockerConfig.platformType.Android, true, mDomainKey);
+            LootLockerSDKManager.Init(mApiKey, "0.0.0.1", true, mDomainKey);
             LootLocker.LootLockerConfig.current.currentDebugLevel = LootLocker.LootLockerConfig.DebugLevel.All;
         }
     }

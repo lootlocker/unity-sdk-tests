@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.lootlocker.lootlockersdk": "file:C:/Users/erik-/projects/unity-sdk",
     "com.unity.2d.animation": "3.2.18",
     "com.unity.2d.pixel-perfect": "2.1.0",
     "com.unity.2d.psdimporter": "2.1.11",

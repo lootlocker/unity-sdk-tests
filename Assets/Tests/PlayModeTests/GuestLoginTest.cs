@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using LootLocker;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -14,12 +14,12 @@ namespace Tests
         {
             // Cleanup
             bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
-            {
-                return cleanupComplete;
+            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
+            LootLockerSDKManager.EndSession((response) => {
+                LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.All; 
+                cleanupComplete = true;
             });
-            yield return null;
+            yield return new WaitUntil(() => cleanupComplete);
         }
 
         [UnityTest]
