@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using LootLocker;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -7,18 +8,19 @@ using LootLocker.Requests;
 
 namespace Tests
 {
-
-    [Ignore("White label has a temporary rate limit in the backend that causes all tests to fail")]
+    [Ignore("There's a bug with start session in the backend")]
     public class WhiteLabelLoginTests
     {
         private static string WL_UNVERIFIED_USER_EMAIL = "erik+unityci@lootlocker.io";
         private static string WL_UNVERIFIED_USER_PASSWORD = "12345678";
         private static int WL_UNVERIFIED_USER_ID = 6249;
+        private static LootLockerConfig.DebugLevel debugLevel;
 
         [UnitySetUp]
         public IEnumerator UnitySetUp()
         {
             LLTestUtils.InitSDK();
+            debugLevel = LootLockerConfig.current.currentDebugLevel;
             yield return null;
         }
 
@@ -27,12 +29,13 @@ namespace Tests
         {
             // Cleanup
             bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
+            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
+            LootLockerSDKManager.EndSession((response) =>
             {
-                return cleanupComplete;
-            }); 
-            yield return null;
+                LootLockerConfig.current.currentDebugLevel = debugLevel;
+                cleanupComplete = true;
+            });
+            yield return new WaitUntil(() => cleanupComplete);
         }
 
         [UnityTest]
@@ -183,6 +186,8 @@ namespace Tests
         [UnityTest]
         public IEnumerator WhiteLabelCheckSessionFailsWhenNoSessionExists()
         {
+            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
+
             // Given
             bool actualSessionState = false;
             bool responseReceived = false;
@@ -307,6 +312,7 @@ namespace Tests
         [UnityTest]
         public IEnumerator WhiteLabelCheckSessionWithWrongEmailFails()
         {
+            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
             // Prerequisite
             int startWhiteLabelSessionStatusCode = -1;
             int expectedStartWhiteLabelSessionStatusCode = 200;
@@ -402,7 +408,7 @@ namespace Tests
             });
 
             // Then
-            Assert.AreEqual(expectedEmailVerificationStatusCode, emailVerificationResetStatusCode, "Email Verficiation request failed, status code not 200");
+            Assert.AreEqual(expectedEmailVerificationStatusCode, emailVerificationResetStatusCode, "Email Verification request failed, status code not 200");
         }
     }
 }

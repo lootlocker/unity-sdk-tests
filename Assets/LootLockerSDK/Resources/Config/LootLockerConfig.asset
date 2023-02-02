@@ -18,7 +18,7 @@ MonoBehaviour:
   domainKey: mmz8d6ze
   gameID: 0
   game_version: 1.0.0.0
-  deviceID: f1abf966-1c20-4eae-b491-ebfa744bb4ca
+  deviceID: 
   platform: 0
   developmentMode: 1
   url: https://api.lootlocker.io/game/v1
