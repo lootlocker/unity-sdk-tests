@@ -62,7 +62,7 @@ public class GuestLogin : MonoBehaviour
                 return;
             }
         } else {
-            LootLockerSDKManager.Init(mApiKey, "0.0.0.1", true, mDomainKey);
+            LootLockerSDKManager.Init(mApiKey, "0.0.0.1", mDomainKey);
             LootLocker.LootLockerConfig.current.currentDebugLevel = LootLocker.LootLockerConfig.DebugLevel.All;
         }
     }
