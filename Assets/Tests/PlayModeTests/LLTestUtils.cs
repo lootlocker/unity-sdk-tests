@@ -45,7 +45,7 @@ namespace Tests
                 }
                 else
                 {
-                    LootLockerSDKManager.Init(apiKey, "0.0.0.1", true, domainKey);
+                    LootLockerSDKManager.Init(apiKey, "0.0.0.1", domainKey);
                     LootLocker.LootLockerConfig.current.currentDebugLevel = LootLocker.LootLockerConfig.DebugLevel.All;
                     initialized = true;
                 }

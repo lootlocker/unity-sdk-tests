@@ -8,7 +8,6 @@ using LootLocker.Requests;
 
 namespace Tests
 {
-    [Ignore("There's a bug with start session in the backend")]
     public class WhiteLabelLoginTests
     {
         private static string WL_UNVERIFIED_USER_EMAIL = "erik+unityci@lootlocker.io";
@@ -387,6 +386,7 @@ namespace Tests
         }
 
         [UnityTest]
+        [Ignore("Rate limitations causes this test to fail")]
         public IEnumerator RequestEmailVerificationSucceeds()
         {
             // Given
