@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using LootLocker;
 using NUnit.Framework;
 using UnityEngine;
@@ -7,9 +7,9 @@ using LootLocker.Requests;
 
 namespace Tests
 {
-    public class AppleSignInTests
+    public class GoogleSignInTests
     {
-        private static string AUTHORIZATION_CODE = "<Needs to be added manually>";
+        private static string ID_TOKEN = "<Needs to be added manually>";
         private static LootLockerConfig.DebugLevel debugLevel;
 
         [UnitySetUp]
@@ -34,15 +34,15 @@ namespace Tests
         }
 
         [UnityTest]
-        public IEnumerator RefreshAppleSessionWithInvalidTokenFails()
+        public IEnumerator RefreshGoogleSessionWithInvalidTokenFails()
         {
             LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
             // Given
-            int expectedResponseCode = 400;
+            int expectedResponseCode = 401;
             int actualResponseCode = -1;
 
             // When
-            LootLockerSDKManager.RefreshAppleSession("invalid-token", (response) =>
+            LootLockerSDKManager.RefreshGoogleSession("invalid-token", (response) =>
             {
                 actualResponseCode = response.statusCode;
             });
@@ -57,14 +57,14 @@ namespace Tests
 
         [UnityTest]
         [Ignore("Needs manual creation of Authorization Code")]
-        public IEnumerator RefreshAppleSessionWhenSignedInSucceeds()
+        public IEnumerator RefreshGoogleSessionWhenSignedInSucceeds()
         {
             // Given
             int actualSignInStatusCode = -1;
             int expectedSignInStatusCode = 200;
             string refreshToken = null;
 
-            LootLockerSDKManager.StartAppleSession(AUTHORIZATION_CODE, (response) =>
+            LootLockerSDKManager.StartGoogleSession(ID_TOKEN, (response) =>
             {
                 actualSignInStatusCode = response.statusCode;
                 refreshToken = response.refresh_token;
@@ -81,7 +81,7 @@ namespace Tests
             int actualResponseCode = -1;
 
             // When
-            LootLockerSDKManager.RefreshAppleSession((response) =>
+            LootLockerSDKManager.RefreshGoogleSession((response) =>
             {
                 actualResponseCode = response.statusCode;
             });
@@ -95,7 +95,7 @@ namespace Tests
 
         [UnityTest]
         [Ignore("Needs manual creation of Authorization Code")]
-        public IEnumerator StartAppleSessionSucceedsAndProvidesRefreshToken()
+        public IEnumerator StartGoogleSessionSucceedsAndProvidesRefreshToken()
         {
             // Given
             int actualSignInStatusCode = -1;
@@ -103,7 +103,7 @@ namespace Tests
             string refreshToken = null;
 
             // When
-            LootLockerSDKManager.StartAppleSession(AUTHORIZATION_CODE, (response) =>
+            LootLockerSDKManager.StartGoogleSession(ID_TOKEN, (response) =>
             {
                 actualSignInStatusCode = response.statusCode;
                 refreshToken = response.refresh_token;
@@ -121,7 +121,7 @@ namespace Tests
         }
 
         [UnityTest]
-        public IEnumerator StartAppleSessionWithInvalidAuthorizationCodeFails()
+        public IEnumerator StartGoogleSessionWithInvalidAuthorizationCodeFails()
         {
             LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
             // Given
@@ -129,7 +129,7 @@ namespace Tests
             int expectedSignInStatusCode = 400;
 
             // When
-            LootLockerSDKManager.StartAppleSession("invalid_auth_code", (response) =>
+            LootLockerSDKManager.StartGoogleSession("invalid_id_token", (response) =>
             {
                 actualSignInStatusCode = response.statusCode;
             });
