@@ -26,8 +26,9 @@ jobs:
           #- editmode
         unityVersion:
           - 2019.4.40f1
-          - 2020.3.38f1
-          - 2021.3.8f1
+          - 2020.3.45f1
+          - 2021.3.19f1
+          - 2022.2.8f1
     steps:
       - name: Checkout SDK repository
         uses: actions/checkout@v2
@@ -49,6 +50,9 @@ jobs:
 
       - name: Set SDK path in test repo
         run: sudo chmod 777 ./tests~/switchLootLockerDependency.sh && ./tests~/switchLootLockerDependency.sh "./tests~/" "file:../../"
+
+      - name: Add Steam App Id file
+        run: echo ${{ secrets.STEAM_APP_ID }} > ./tests~/steam_appid.txt
 
       - name: Cache Libraries
         uses: actions/cache@v2

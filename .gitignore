@@ -61,3 +61,6 @@ crashlytics-build.properties
 
 # Ignore Test Results
 [Aa]ssets/InitTestScene*
+
+# Don't share steam app id (It's secret ;) )
+steam_appid.txt

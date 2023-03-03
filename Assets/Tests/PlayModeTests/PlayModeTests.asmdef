@@ -4,7 +4,9 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "GuestLoginAssembly",
-        "lootlocker.lootlockersdk.runtime"
+        "lootlocker.lootlockersdk.runtime",
+        "com.rlabrecque.steamworks.net",
+        "SteamManager"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
