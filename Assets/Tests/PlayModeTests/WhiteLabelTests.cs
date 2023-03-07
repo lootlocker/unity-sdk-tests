@@ -410,5 +410,31 @@ namespace Tests
             // Then
             Assert.AreEqual(expectedEmailVerificationStatusCode, emailVerificationResetStatusCode, "Email Verification request failed, status code not 200");
         }
+
+        [UnityTest]
+        [Ignore("Rate limitations causes this test to fail")]
+        public IEnumerator RequestEmailVerificationByEmailSucceeds()
+        {
+            // Given
+            int expectedEmailVerificationStatusCode = 204;
+            int emailVerificationResetStatusCode = -1;
+            bool responseReceived = false;
+
+            // When
+            LootLockerSDKManager.WhiteLabelRequestVerification(WL_UNVERIFIED_USER_EMAIL, (response) =>
+            {
+                emailVerificationResetStatusCode = response.statusCode;
+                responseReceived = true;
+            });
+
+            // Wait for response
+            yield return new WaitUntil(() =>
+            {
+                return responseReceived;
+            });
+
+            // Then
+            Assert.AreEqual(expectedEmailVerificationStatusCode, emailVerificationResetStatusCode, "Email Verification request failed, status code not 200");
+        }
     }
 }

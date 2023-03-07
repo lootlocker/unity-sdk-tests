@@ -7,6 +7,7 @@ using LootLocker.Requests;
 
 namespace Tests
 {
+    [Ignore("Needs to be setup properly with Google Sign in")]
     public class GoogleSignInTests
     {
         private static string ID_TOKEN = "<Needs to be added manually>";
@@ -42,7 +43,7 @@ namespace Tests
             int actualResponseCode = -1;
 
             // When
-            LootLockerSDKManager.RefreshGoogleSession("invalid-token", (response) =>
+            LootLockerSDKManager.RefreshGoogleSession("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c", (response) =>
             {
                 actualResponseCode = response.statusCode;
             });
@@ -126,10 +127,10 @@ namespace Tests
             LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
             // Given
             int actualSignInStatusCode = -1;
-            int expectedSignInStatusCode = 400;
+            int expectedSignInStatusCode = 401;
 
             // When
-            LootLockerSDKManager.StartGoogleSession("invalid_id_token", (response) =>
+            LootLockerSDKManager.StartGoogleSession("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c", (response) =>
             {
                 actualSignInStatusCode = response.statusCode;
             });
