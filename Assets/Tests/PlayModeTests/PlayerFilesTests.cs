@@ -53,6 +53,7 @@ namespace Tests
             bool completed = false;
             int expectedStatusCode = 200;
             LootLockerPlayerFile actualResponse = new LootLockerPlayerFile();
+            bool setToPublic = true;
 
             // When
             LootLockerSDKManager.StartGuestSession(PlayerIdentifier, response =>
@@ -63,7 +64,7 @@ namespace Tests
                     completed = true;
                     return;
                 }
-                LootLockerSDKManager.UploadPlayerFile(path, "test", true, fileResponse =>
+                LootLockerSDKManager.UploadPlayerFile(path, "test", setToPublic, fileResponse =>
                 {
                     actualResponse = fileResponse;
                     completed = true;
@@ -76,10 +77,12 @@ namespace Tests
             // Then
             Assert.IsTrue(actualResponse.success, "File upload failed");
             Assert.AreEqual(expectedStatusCode, actualResponse.statusCode, "Delete player returned non 200 response code");
+            Assert.AreEqual(setToPublic, actualResponse.is_public, "File does not have the same public setting");
 
             // Then Given - GET CONTENT
             completed = false;
             string actualUploadedContent = null;
+            bool actualPublicState = false;
 
             // When
             LootLockerSDKManager.GetPlayerFile(actualResponse.id, fileResponse =>
@@ -91,6 +94,7 @@ namespace Tests
                     Stream data = client.OpenRead(@fileResponse.url);
                     StreamReader reader = new StreamReader(data);
                     actualUploadedContent = reader.ReadToEnd();
+                    actualPublicState = fileResponse.is_public;
                     completed = true;
                 }
             });
@@ -101,6 +105,7 @@ namespace Tests
             // Then
             Assert.IsNotNull(actualUploadedContent, "File could not be fetched");
             Assert.AreEqual(content.Trim(), actualUploadedContent.Trim(), "Content did not match in the downloaded file");
+            Assert.AreEqual(setToPublic, actualPublicState, "File does not have the same public setting");
 
             // Then Given - UPDATE FILE
             completed = false;
@@ -125,6 +130,7 @@ namespace Tests
             Assert.IsTrue(actualUpdateResponse.success, "Failed to update file");
             Assert.AreEqual(actualResponse.id, actualUpdateResponse.id, "Id of the file changed");
             Assert.AreNotEqual(actualResponse.revision_id, actualUpdateResponse.revision_id, "Revision Id did not change");
+            Assert.AreEqual(setToPublic, actualUpdateResponse.is_public, "File does not have the same public setting");
 
             // Then Given - GET UPDATED CONTENT
             completed = false;
@@ -140,6 +146,7 @@ namespace Tests
                     Stream data = client.OpenRead(@fileResponse.url);
                     StreamReader reader = new StreamReader(data);
                     actualUpdatedContent = reader.ReadToEnd();
+                    actualPublicState = fileResponse.is_public;
                     completed = true;
                 }
             });
@@ -151,6 +158,7 @@ namespace Tests
             Assert.IsNotNull(actualUpdatedContent, "File could not be fetched");
             Assert.AreNotEqual(content.Trim(), actualUpdatedContent.Trim(), "Content did not update in the downloaded file");
             Assert.AreEqual(updatedFileContent.Trim(), actualUpdatedContent.Trim(), "Content did not match in the downloaded file");
+            Assert.AreEqual(setToPublic, actualPublicState, "File does not have the same public setting");
 
             // Then Given - DELETE FILE
             completed = false;
