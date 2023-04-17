@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Threading;
+using LootLocker;
 using LootLocker.Requests;
 
 namespace Tests
@@ -23,6 +24,7 @@ namespace Tests
             string domainKey = null;
             if (!initialized)
             {
+                LootLockerConfig.current.clientSideRequestTimeOut = 10f;
                 string[] args = System.Environment.GetCommandLineArgs();
                 for (int i = 0; i < args.Length; i++)
                 {
