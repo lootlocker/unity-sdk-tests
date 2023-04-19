@@ -13,11 +13,14 @@ namespace Tests
         private static string WL_USER_EMAIL = "erik+unityci@lootlocker.io";
         private static string WL_USER_PASSWORD = "12345678";
         private static LootLockerConfig.DebugLevel _debugLevel;
+        private static bool _autoRefresh;
+
         [UnitySetUp]
         public IEnumerator UnitySetUp()
         {
             LLTestUtils.InitSDK();
             _debugLevel = LootLockerConfig.current.currentDebugLevel;
+            _autoRefresh = LootLockerConfig.current.allowTokenRefresh;
             // When
             bool wlLoginCompleted = false;
             LootLockerSDKManager.WhiteLabelLoginAndStartSession(WL_USER_EMAIL, WL_USER_PASSWORD, true, response =>
@@ -38,6 +41,7 @@ namespace Tests
             LootLockerSDKManager.EndSession((response) =>
             {
                 LootLockerConfig.current.currentDebugLevel = _debugLevel;
+                LootLockerConfig.current.allowTokenRefresh = _autoRefresh;
                 cleanupComplete = true;
             });
             yield return new WaitUntil(() => cleanupComplete);
