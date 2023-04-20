@@ -44,6 +44,7 @@ namespace Tests
                 LootLockerConfig.current.allowTokenRefresh = _autoRefresh;
                 cleanupComplete = true;
             });
+            LootLockerSDKManager.ClearLocalSession();
             yield return new WaitUntil(() => cleanupComplete);
         }
 
