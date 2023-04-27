@@ -1,14 +1,21 @@
-﻿using LootLocker.ZeroDepJson;
+﻿using LootLocker;
+using LootLocker.Requests;
+#if !LOOTLOCKER_USE_NEWTONSOFTJSON
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using LootLocker;
-using LootLocker.Requests;
+using LLlibs.ZeroDepJson;
+#endif
 using NUnit.Framework;
 
 namespace Tests
 {
+    public class MultiDimensionalArrayClass
+    {
+        public string[][] multiDimensionalArray { get; set; }
+    }
+
     public class JsonTests
     {
 
@@ -17,15 +24,79 @@ namespace Tests
         {
             // Given
             const string validGuestSessionResponse =
-                "{\n  \"success\": true,\n  \"session_token\": \"e6fa44946f077dd9fe67311ab3f188c596df9969\",\n  \"player_id\": 3,\n  \"public_uid\": \"TSEYDXD8\",\n  \"player_identifier\": \"uuid-11223344\",\n  \"player_created_at\": \"2022-05-30T07:56:01+00:00\",\n  \"check_grant_notifications\": true,\n  \"check_deactivation_notifications\": false,\n  \"seen_before\": true\n}"; LootLockerSessionRequest SessionRequest = new LootLockerSessionRequest("uuid-11223344");
+                "{\n  \"success\": true,\n  \"session_token\": \"e6fa44946f077dd9fe67311ab3f188c596df9969\",\n  \"player_id\": 3,\n  \"public_uid\": \"TSEYDXD8\",\n  \"player_identifier\": \"uuid-11223344\",\n  \"player_created_at\": \"2022-05-30T07:56:01+00:00\",\n  \"check_grant_notifications\": true,\n  \"check_deactivation_notifications\": false,\n  \"seen_before\": true\n}";
 
             // When
-            LootLockerSessionRequest deserializedSessionRequest = LootLockerJson.DeserializeObject<LootLockerSessionRequest>(validGuestSessionResponse);
+            LootLockerSessionRequest deserializedSessionRequest =
+                LootLockerJson.DeserializeObject<LootLockerSessionRequest>(validGuestSessionResponse);
 
             // Then
             Assert.NotNull(deserializedSessionRequest, "Not deserialized, is null");
-            Assert.NotNull(deserializedSessionRequest.player_identifier, "Not deserialized, does not contain player_identifier property");
-            Assert.AreEqual(deserializedSessionRequest.player_identifier, "uuid-11223344", "Not deserialized, does not contain player_identifier value");
+            Assert.NotNull(deserializedSessionRequest.player_identifier,
+                "Not deserialized, does not contain player_identifier property");
+            Assert.AreEqual(deserializedSessionRequest.player_identifier, "uuid-11223344",
+                "Not deserialized, does not contain player_identifier value");
+        }
+
+        [Test]
+        public void SDKCanDeserializeComplexArrayObjectsJson()
+        {
+            // Given
+            const string complexJson =
+                "{\n\"success\": true,\n\"loadouts\": [\n{\n\"character\": {\n\"id\": 3015691,\n\"type\": \"Wizard\",\n\"name\": \"Bb32\",\n\"is_default\": true\n},\n\"loadout\": []\n}\n]\n}";
+
+            // When
+            LootLockerCharacterLoadoutResponse deserializedCharacterLoadoutResponse =
+                LootLockerJson.DeserializeObject<LootLockerCharacterLoadoutResponse>(complexJson);
+
+            // Then
+            Assert.NotNull(deserializedCharacterLoadoutResponse, "Not deserialized, is null");
+            Assert.NotNull(deserializedCharacterLoadoutResponse.GetCharacters(),
+                "Not deserialized, does not contain characters");
+            Assert.IsNotEmpty(deserializedCharacterLoadoutResponse.GetCharacters(),
+                "Not deserialized, does not contain characters");
+            Assert.AreEqual(deserializedCharacterLoadoutResponse.GetCharacter("Bb32").type, "Wizard",
+                "Not deserialized, does not contain the correct character");
+        }
+
+        [Test]
+        public void SDKCanDeserializeMultidimensionalArrayObjectsJson()
+        {
+            // Given
+            const string multiDimJson =
+                "{\n\"multiDimensionalArray\": [[\"1-1\", \"1-2\", \"1-3\", \"1-4\"], [\"2-1\", \"2-2\", \"2-3\"], [\"3-1\", \"3-2\"]]\n}\n]\n}";
+
+            // When
+            MultiDimensionalArrayClass deserializedMultiDimensionalArray =
+                LootLockerJson.DeserializeObject<MultiDimensionalArrayClass>(multiDimJson);
+
+            // Then
+            Assert.NotNull(deserializedMultiDimensionalArray, "Not deserialized, is null");
+            Assert.NotNull(deserializedMultiDimensionalArray.multiDimensionalArray,
+                "Not deserialized, does not contain multi dimensional array");
+            Assert.IsNotEmpty(deserializedMultiDimensionalArray.multiDimensionalArray,
+                "Not deserialized, does not contain multi dimensional array");
+            Assert.AreEqual("2-2", deserializedMultiDimensionalArray.multiDimensionalArray[1][1],
+                "Not deserialized, does not contain the correct value");
+        }
+
+        [Test]
+        public void SDKCanSerializeMultidimensionalArrayObjectsJson()
+        {
+            // Given
+            MultiDimensionalArrayClass mdArray = new MultiDimensionalArrayClass();
+            mdArray.multiDimensionalArray = new[]
+                { new[] { "1-1", "1-2", "1-3", "1-4" }, new[] { "2-1", "2-2", "2-3" }, new[] { "3-1", "3-2" } };
+
+            // When
+            string serializedJson = LootLockerJson.SerializeObject(mdArray);
+
+            // Then
+            Assert.NotNull(serializedJson, "Not serialized, is null");
+            Assert.AreNotEqual("{}", serializedJson, "Not serialized, empty");
+            Assert.IsTrue(serializedJson.Contains("multiDimensionalArray"),
+                "Not Serialized, does not contain multiDimensionalArray property");
+            Assert.IsTrue(serializedJson.Contains("3-1"), "Not Serialized, does not contain 3-1 value");
         }
 
         [Test]
@@ -40,10 +111,13 @@ namespace Tests
             // Then
             Assert.NotNull(serializedJson, "Not serialized, is null");
             Assert.AreNotEqual("{}", serializedJson, "Not serialized, empty");
-            Assert.IsTrue(serializedJson.Contains("player_identifier"), "Not Serialized, does not contain player_identifier property");
-            Assert.IsTrue(serializedJson.Contains("uuid-11223344"), "Not Serialized, does not contain player_identifier value");
+            Assert.IsTrue(serializedJson.Contains("player_identifier"),
+                "Not Serialized, does not contain player_identifier property");
+            Assert.IsTrue(serializedJson.Contains("uuid-11223344"),
+                "Not Serialized, does not contain player_identifier value");
         }
 
+#if !LOOTLOCKER_USE_NEWTONSOFTJSON
         [Test]
         public void JsonTestsSimplePasses()
         {
@@ -245,4 +319,7 @@ namespace Tests
 
         public override string ToString() => Name;
     }
+#else
+    }
+#endif
 }
