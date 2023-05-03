@@ -1,13 +1,13 @@
 {
-    "name": "PlayModeTests",
+    "name": "EditModeTests",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "GuestLoginAssembly",
-        "lootlocker.lootlockersdk.runtime",
         "TestUtils"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,

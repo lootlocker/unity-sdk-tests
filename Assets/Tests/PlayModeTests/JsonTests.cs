@@ -120,7 +120,7 @@ namespace Tests
 #if !LOOTLOCKER_USE_NEWTONSOFTJSON
         [Test]
         public void JsonTestsSimplePasses()
-        {
+        { 
             Assert.AreEqual("true", Json.Serialize(true));
             Assert.AreEqual("false", Json.Serialize(false));
             Assert.AreEqual("12345678", Json.Serialize(12345678));
