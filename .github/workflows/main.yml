@@ -25,8 +25,9 @@ jobs:
           - editmode
         unityVersion:
           - 2019.4.40f1
-          - 2020.3.38f1
-          - 2021.3.8f1
+          - 2020.3.47f1
+          - 2021.3.24f1
+          - 2022.2.17f1
     steps:
       - name: Checkout SDK repository
         uses: actions/checkout@v2
