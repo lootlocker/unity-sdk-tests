@@ -27,6 +27,7 @@ namespace Tests
         [UnitySetUp]
         public IEnumerator UnitySetup()
         {
+            Debug.Log("Setup Started");
             listInstalledPackagesRequest = Client.List();
             EditorApplication.update += ListRequestProgress;
 
@@ -52,13 +53,15 @@ namespace Tests
 
             sampleScenes = Directory.GetFiles(importedSamplesPath + "/Scenes", "*.unity");
 
+            Debug.Log("Setup Ended");
             yield return null;
         }
 
         [UnityTearDown]
         public IEnumerator UnityTearDown()
         {
-            if (!EditorSceneManager.GetActiveScene().path.Equals(previouslyActiveScenePath))
+            Debug.Log("Teardown started");
+            if (!string.IsNullOrEmpty(previouslyActiveScenePath) && !EditorSceneManager.GetActiveScene().path.Equals(previouslyActiveScenePath))
             {
                 EditorSceneManager.SetActiveScene(EditorSceneManager.OpenScene(previouslyActiveScenePath));
                 EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(previouslyActiveScenePath);
@@ -75,13 +78,16 @@ namespace Tests
             }
 
             AssetDatabase.DeleteAsset("Assets/Samples");
+            Debug.Log("Teardown ended");
             yield return null;
         }
 
         [UnityTest]
-        public IEnumerator AddLootLockerSDKSamplesBuildAndRunAllScenesSucceeds()
+        public IEnumerator AddLootLockerSDKSamplesBuildAllScenesSucceeds()
         {
+            Debug.Log("Test started at least");
             previouslyActiveScenePath = EditorSceneManager.GetSceneAt(0).path;
+            Debug.Log("Previously Active Scene: " + previouslyActiveScenePath);
             LLTestUtils.InitSDK();
 
             Assert.IsNotEmpty(lootLockerPackageVersion, "LootLocker Package not found");
