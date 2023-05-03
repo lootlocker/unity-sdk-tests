@@ -6,6 +6,7 @@
 /[Tt]emp/
 /[Oo]bj/
 /[Bb]uild/
+[Bb]uild
 /[Bb]uilds/
 /[Ll]ogs/
 /[Mm]emoryCaptures/
@@ -61,3 +62,9 @@ crashlytics-build.properties
 
 # Ignore Test Results
 [Aa]ssets/InitTestScene*
+
+# Ignore system files
+*.DS_Store
+
+# Ignore config files
+steam_appid.txt
