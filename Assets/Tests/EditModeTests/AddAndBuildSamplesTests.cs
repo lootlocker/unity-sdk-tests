@@ -14,6 +14,7 @@ using UnityEngine.SceneManagement;
 
 namespace Tests
 {
+    [Ignore("Not finished")]
     public class AddAndRunSamplesTests
     {
         static ListRequest listInstalledPackagesRequest;
