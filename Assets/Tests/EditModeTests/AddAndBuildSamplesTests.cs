@@ -41,9 +41,11 @@ namespace Tests
                     {
                         if (sample.displayName == "LootLockerExamples")
                         {
+                            Debug.LogError("Please fail here1");
                             sample.Import(Sample.ImportOptions.HideImportWindow | Sample.ImportOptions.OverridePreviousImports);
                             if (sample.isImported)
                             {
+                                Debug.LogError("Please fail here2");
                                 importedSamplesPath = sample.importPath.Substring(sample.importPath.IndexOf("Assets/")); //Relative path
                             }
                         }
