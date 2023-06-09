@@ -41,11 +41,9 @@ namespace Tests
                     {
                         if (sample.displayName == "LootLockerExamples")
                         {
-                            Debug.LogError("Please fail here1");
                             sample.Import(Sample.ImportOptions.HideImportWindow | Sample.ImportOptions.OverridePreviousImports);
                             if (sample.isImported)
                             {
-                                Debug.LogError("Please fail here2");
                                 importedSamplesPath = sample.importPath.Substring(sample.importPath.IndexOf("Assets/")); //Relative path
                             }
                         }
@@ -91,6 +89,7 @@ namespace Tests
             previouslyActiveScenePath = EditorSceneManager.GetSceneAt(0).path;
             Debug.Log("Previously Active Scene: " + previouslyActiveScenePath);
             LLTestUtils.InitSDK();
+            Debug.LogError("BAILANDO FAILS");
 
             /*Assert.IsNotEmpty(lootLockerPackageVersion, "LootLocker Package not found");
             Assert.IsNotEmpty(importedSamplesPath, "Samples not imported");
