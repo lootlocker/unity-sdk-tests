@@ -41,17 +41,17 @@ namespace Tests
                     {
                         if (sample.displayName == "LootLockerExamples")
                         {
-                            /*sample.Import(Sample.ImportOptions.HideImportWindow | Sample.ImportOptions.OverridePreviousImports);
+                            sample.Import(Sample.ImportOptions.HideImportWindow | Sample.ImportOptions.OverridePreviousImports);
                             if (sample.isImported)
                             {
                                 importedSamplesPath = sample.importPath.Substring(sample.importPath.IndexOf("Assets/")); //Relative path
-                            }*/
+                            }
                         }
                     }
                 }
             }
 
-            //sampleScenes = Directory.GetFiles(importedSamplesPath + "/Scenes", "*.unity");
+            sampleScenes = Directory.GetFiles(importedSamplesPath + "/Scenes", "*.unity");
 
             Debug.Log("Setup Ended");
             yield return null;
