@@ -73,3 +73,6 @@ UnityCrashHandler32.exe
 
 # Ignore config files
 steam_appid.txt
+
+# Ignore dll files
+*.dll

@@ -44,7 +44,9 @@ namespace Tests
                             sample.Import(Sample.ImportOptions.HideImportWindow | Sample.ImportOptions.OverridePreviousImports);
                             if (sample.isImported)
                             {
-                                importedSamplesPath = sample.importPath.Substring(sample.importPath.IndexOf("Assets/")); //Relative path
+                                int substringStartIndex = sample.importPath.IndexOf("Assets/");
+                                if (substringStartIndex < 0) { substringStartIndex = sample.importPath.IndexOf("Assets\\"); }
+                                importedSamplesPath = sample.importPath.Substring(substringStartIndex); //Relative path
                             }
                         }
                     }
@@ -85,13 +87,10 @@ namespace Tests
         [UnityTest]
         public IEnumerator AddLootLockerSDKSamplesBuildAllScenesSucceeds()
         {
-            Debug.Log("Test started at least");
             previouslyActiveScenePath = EditorSceneManager.GetSceneAt(0).path;
-            Debug.Log("Previously Active Scene: " + previouslyActiveScenePath);
             LLTestUtils.InitSDK();
-            Debug.LogError("BAILANDO FAILS");
 
-            /*Assert.IsNotEmpty(lootLockerPackageVersion, "LootLocker Package not found");
+            Assert.IsNotEmpty(lootLockerPackageVersion, "LootLocker Package not found");
             Assert.IsNotEmpty(importedSamplesPath, "Samples not imported");
             foreach (var sampleScene in sampleScenes)
             {
@@ -109,7 +108,7 @@ namespace Tests
             Debug.Log("Build completed, Summary: Build time - " + (buildReport.summary.buildEndedAt - buildReport.summary.buildStartedAt).Seconds + "s. Result - " + buildReport.summary.result + ". Errors - " + buildReport.summary.totalErrors + ". Warnings - " + buildReport.summary.totalWarnings);
 
             Assert.AreEqual(UnityEditor.Build.Reporting.BuildResult.Succeeded, buildReport.summary.result, "Compilation succeeded");
-            */
+            
 
             yield return null;
         }
