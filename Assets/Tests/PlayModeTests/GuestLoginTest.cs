@@ -9,14 +9,24 @@ namespace Tests
 {
     public class GuestLoginTest
     {
+        private static LootLockerConfig.DebugLevel debugLevel;
+
+        [UnitySetUp]
+        public IEnumerator UnitySetUp()
+        {
+            LLTestUtils.InitSDK();
+            debugLevel = LootLockerConfig.current.currentDebugLevel;
+            yield return null;
+        }
+
         [UnityTearDown]
         public IEnumerator UnityTearDown()
         {
             // Cleanup
+            LootLockerConfig.current.currentDebugLevel = debugLevel;
             bool cleanupComplete = false;
-            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
-            LootLockerSDKManager.EndSession((response) => {
-                LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.All; 
+            LootLockerSDKManager.EndSession((response) =>
+            {
                 cleanupComplete = true;
             });
             yield return new WaitUntil(() => cleanupComplete);
@@ -25,11 +35,26 @@ namespace Tests
         [UnityTest]
         public IEnumerator GuestUserCanLogIn()
         {
-            var guestLoginGO = new GameObject();
-            var guestLogin = guestLoginGO.AddComponent<GuestLogin>();
-            yield return new WaitUntil(() => guestLogin.IsDone());
-            Assert.IsTrue(guestLogin.IsLoggedIn());
-            Assert.IsTrue(guestLogin.GetPlayerId() != 0);
+            LLTestUtils.InitSDK();
+
+            string PlayerIdentifier = System.Guid.NewGuid().ToString();
+            string ActualPlayerIdentifier = "";
+            bool guestLogin = false;
+
+            // When
+            LootLockerSDKManager.StartGuestSession(PlayerIdentifier, response =>
+            {
+                if (!response.success)
+                {
+                    Assert.Fail("Required Guest Login failed");
+                }
+                ActualPlayerIdentifier = response.player_identifier;
+                guestLogin = true;
+            });
+
+            // Wait for response
+            yield return new WaitUntil(() => guestLogin);
+            Assert.AreEqual(ActualPlayerIdentifier, PlayerIdentifier, "The expected player identifier was not set on the user");
         }
     }
 }

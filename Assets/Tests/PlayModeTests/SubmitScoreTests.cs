@@ -4,15 +4,20 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using LootLocker.Requests;
+using LootLocker;
+using System.IO;
 
 namespace Tests
 {
     public class SubmitScoresWithGuestLogin
     {
+        private static LootLockerConfig.DebugLevel debugLevel;
+
         [UnitySetUp]
         public IEnumerator UnitySetUp()
         {
             LLTestUtils.InitSDK();
+            debugLevel = LootLockerConfig.current.currentDebugLevel;
             yield return null;
         }
 
@@ -20,13 +25,13 @@ namespace Tests
         public IEnumerator UnityTearDown()
         {
             // Cleanup
+            LootLockerConfig.current.currentDebugLevel = debugLevel;
             bool cleanupComplete = false;
-            LootLockerSDKManager.EndSession((response) => { cleanupComplete = true; });
-            yield return new WaitUntil(() =>
+            LootLockerSDKManager.EndSession((response) =>
             {
-                return cleanupComplete;
+                cleanupComplete = true;
             });
-            yield return null;
+            yield return new WaitUntil(() => cleanupComplete);
         }
 
         [UnityTest]
@@ -35,12 +40,23 @@ namespace Tests
         {
             // Given
             int responsesExpected = 2 * players.Length * leaderboards.Length;
-            var guestLoginGO = new GameObject();
-            var guestLogin = guestLoginGO.AddComponent<GuestLogin>();
+            LLTestUtils.InitSDK();
 
-            // Wait for SDK Init
-            yield return new WaitUntil(() => guestLogin.IsDone());
-            Assert.IsTrue(guestLogin.IsLoggedIn());
+            string PlayerIdentifier = System.Guid.NewGuid().ToString();
+            bool guestLogin = false;
+
+            // When
+            LootLockerSDKManager.StartGuestSession(PlayerIdentifier, response =>
+            {
+                if (!response.success)
+                {
+                    Assert.Fail("Required Guest Login failed");
+                }
+                guestLogin = true;
+            });
+
+            // Wait for response
+            yield return new WaitUntil(() => guestLogin);
 
             // When
             int responsesReceived = 0;
