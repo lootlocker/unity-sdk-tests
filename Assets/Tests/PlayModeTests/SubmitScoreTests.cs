@@ -1,15 +1,121 @@
 using System.Collections;
-using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using LootLocker.Requests;
+using LootLocker;
+using LLlibs.ZeroDepJson;
 
 namespace Tests
 {
     public class SubmitScoresWithGuestLogin
     {
+        /*LLlibs.ZeroDepJson.Json.setIt((logLine) =>
+        {
+            Debug.Log(logLine);
+            return true;
+        }); */
+        private static LootLockerConfig.DebugLevel debugLevel;
+        int playerId = 0;
         [UnitySetUp]
+        public IEnumerator UnitySetUp()
+        {
+            Json.SetIt((logLine) => { Debug.LogWarning("ZeroDepJsonLog: " + logLine); return true; });
+            LLTestUtils.InitSDK();
+            debugLevel = LootLockerConfig.current.currentDebugLevel;
+            bool loginCompleted = false;
+            LootLockerSDKManager.StartGuestSession(System.Guid.NewGuid().ToString(), response =>
+            {
+                if (!response.success)
+                {
+                    Assert.Fail("Required Guest Login failed");
+                }
+                playerId = response.player_id;
+                loginCompleted = true;
+            });
+            yield return new WaitUntil(() => loginCompleted);
+            yield return null;
+        }
+
+        [UnityTearDown]
+        public IEnumerator UnityTearDown()
+        {
+            // Cleanup
+            bool cleanupComplete = false;
+            LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
+            LootLockerSDKManager.DeletePlayer(deleteResponse =>
+            {
+                LootLockerSDKManager.EndSession((response) =>
+                {
+                    LootLockerConfig.current.currentDebugLevel = debugLevel;
+                    cleanupComplete = true;
+                });
+            });
+            yield return new WaitUntil(() => cleanupComplete);
+        }
+
+        [UnityTest]
+        public IEnumerator ScoreSubmittalTest()
+        {
+            int randFactor = UnityEngine.Random.Range(0, 1000);
+            for (int i = -1; i <= 100; i = (i + 1)*randFactor)
+            {
+                // Given
+                bool scoreSubmitCompleted = false;
+                int expectedScore = i;
+                int actualScore = 0;
+                bool actualSuccess = false;
+
+                // When
+                LootLockerSDKManager.SubmitScore(playerId.ToString(), i, "leaderboard1", (response) =>
+                {
+                    actualSuccess = response.success;
+                    actualScore = response.score;
+                    scoreSubmitCompleted = true;
+                });
+
+                // Wait for response
+                yield return new WaitUntil(() => scoreSubmitCompleted);
+
+                // Then
+                Assert.IsTrue(actualSuccess, "ScoreSubmit failed unexpectedly");
+                Assert.AreEqual(expectedScore, actualScore, "Wrong score was submitted");
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator ProgressionSubmittalTest()
+        {
+            ulong randFactor = 3;
+            ulong aggregatedScore = 0;
+            for (ulong i = 0; i <= 100; i = (i + 1) * randFactor)
+            {
+                // Given
+                aggregatedScore += i;
+                bool scoreSubmitCompleted = false;
+                ulong expectedScore = aggregatedScore;
+                ulong actualScore = 0;
+                bool actualSuccess = false;
+
+                // When
+                LootLockerSDKManager.AddPointsToPlayerProgression("derpystate", i, (response) =>
+                {
+                    actualSuccess = response.success;
+                    actualScore = response.points;
+                    scoreSubmitCompleted = true;
+                });
+
+                // Wait for response
+                yield return new WaitUntil(() => scoreSubmitCompleted);
+
+                // Then
+                Assert.IsTrue(actualSuccess, "ScoreSubmit failed unexpectedly");
+                Assert.AreEqual(expectedScore, actualScore, "Wrong score was submitted");
+            }
+        }
+    }
+
+    /*[UnitySetUp]
         public IEnumerator UnitySetUp()
         {
             LLTestUtils.InitSDK();
@@ -140,5 +246,5 @@ namespace Tests
             public bool hasMetadata;
             public bool isPlayerType;
         }
-    }
+    }*/
 }
