@@ -8,6 +8,7 @@ using LootLocker.Requests;
 
 namespace Tests
 {
+    [Ignore("These tests continuously causes rate limiting errors so I'm disabling them until we've moved CI to stage")]
     public class WhiteLabelLoginTests
     {
         private static string WL_UNVERIFIED_USER_EMAIL = "erik+unityci@lootlocker.io";
