@@ -38,7 +38,7 @@ namespace Tests
         {
             LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
             // Given
-            int expectedResponseCode = 400;
+            int expectedResponseCode = 401;
             int actualResponseCode = -1;
 
             // When
@@ -126,7 +126,7 @@ namespace Tests
             LootLockerConfig.current.currentDebugLevel = LootLockerConfig.DebugLevel.AllAsNormal;
             // Given
             int actualSignInStatusCode = -1;
-            int expectedSignInStatusCode = 400;
+            int expectedSignInStatusCode = 401;
 
             // When
             LootLockerSDKManager.StartAppleSession("invalid_auth_code", (response) =>
