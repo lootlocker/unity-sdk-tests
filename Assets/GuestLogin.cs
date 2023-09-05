@@ -40,7 +40,7 @@ public class GuestLogin : MonoBehaviour
             }
             else
             {
-                Debug.LogError("Error: " + response.Error);
+                Debug.LogError("Error: " + response.errorData.message);
                 mIsRequestDone = true;
                 mIsRequestInProgress = false;
             }
