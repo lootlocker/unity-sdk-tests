@@ -306,9 +306,11 @@ namespace Tests.Economy
             string characterUlid = "";
             completed = false;
 
-            LootLockerSDKManager.CreateCharacter(2.ToString(), "Beast", true, response =>
+            string characterName = System.Guid.NewGuid().ToString();
+
+            LootLockerSDKManager.CreateCharacter(2.ToString(), characterName, true, response =>
             {
-                characterUlid = response.GetCharacter("Beast").ulid;
+                characterUlid = response.GetCharacter(characterName).ulid;
                 completed = true;
             });
 
