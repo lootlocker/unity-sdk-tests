@@ -46,16 +46,16 @@ namespace Tests
                 "{\n\"success\": true,\n\"loadouts\": [\n{\n\"character\": {\n\"id\": 3015691,\n\"type\": \"Wizard\",\n\"name\": \"Bb32\",\n\"is_default\": true\n},\n\"loadout\": []\n}\n]\n}";
 
             // When
-            LootLockerCharacterLoadoutResponse deserializedCharacterLoadoutResponse =
-                LootLockerJson.DeserializeObject<LootLockerCharacterLoadoutResponse>(complexJson);
+            LootLockerClassLoadoutResponse deserializedCharacterLoadoutResponse =
+                LootLockerJson.DeserializeObject<LootLockerClassLoadoutResponse>(complexJson);
 
             // Then
             Assert.NotNull(deserializedCharacterLoadoutResponse, "Not deserialized, is null");
-            Assert.NotNull(deserializedCharacterLoadoutResponse.GetCharacters(),
+            Assert.NotNull(deserializedCharacterLoadoutResponse.GetClassess(),
                 "Not deserialized, does not contain characters");
-            Assert.IsNotEmpty(deserializedCharacterLoadoutResponse.GetCharacters(),
+            Assert.IsNotEmpty(deserializedCharacterLoadoutResponse.GetClassess(),
                 "Not deserialized, does not contain characters");
-            Assert.AreEqual(deserializedCharacterLoadoutResponse.GetCharacter("Bb32").type, "Wizard",
+            Assert.AreEqual(deserializedCharacterLoadoutResponse.GetClass("Bb32").type, "Wizard",
                 "Not deserialized, does not contain the correct character");
         }
 
