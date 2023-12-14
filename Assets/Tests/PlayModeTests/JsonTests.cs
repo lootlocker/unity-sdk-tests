@@ -1,4 +1,5 @@
-﻿using LootLocker;
+﻿using System.Text.RegularExpressions;
+using LootLocker;
 using LootLocker.Requests;
 #if !LOOTLOCKER_USE_NEWTONSOFTJSON
 using System;
@@ -6,8 +7,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using LLlibs.ZeroDepJson;
+#else
+using Newtonsoft.Json;
 #endif
 using NUnit.Framework;
+using UnityEngine;
+using static Tests.JsonTests;
 
 namespace Tests
 {
@@ -63,8 +68,7 @@ namespace Tests
         public void SDKCanDeserializeMultidimensionalArrayObjectsJson()
         {
             // Given
-            const string multiDimJson =
-                "{\n\"multiDimensionalArray\": [[\"1-1\", \"1-2\", \"1-3\", \"1-4\"], [\"2-1\", \"2-2\", \"2-3\"], [\"3-1\", \"3-2\"]]\n}\n]\n}";
+            string multiDimJson = "{\"multi_dimensional_array\":[[\"1-1\",\"1-2\",\"1-3\",\"1-4\"],[\"2-1\",\"2-2\",\"2-3\"],[\"3-1\",\"3-2\"]]}";
 
             // When
             MultiDimensionalArrayClass deserializedMultiDimensionalArray =
@@ -80,6 +84,7 @@ namespace Tests
                 "Not deserialized, does not contain the correct value");
         }
 
+
         [Test]
         public void SDKCanSerializeMultidimensionalArrayObjectsJson()
         {
@@ -94,7 +99,7 @@ namespace Tests
             // Then
             Assert.NotNull(serializedJson, "Not serialized, is null");
             Assert.AreNotEqual("{}", serializedJson, "Not serialized, empty");
-            Assert.IsTrue(serializedJson.Contains("multiDimensionalArray"),
+            Assert.IsTrue(serializedJson.Contains("multi_dimensional_array"),
                 "Not Serialized, does not contain multiDimensionalArray property");
             Assert.IsTrue(serializedJson.Contains("3-1"), "Not Serialized, does not contain 3-1 value");
         }
@@ -115,6 +120,151 @@ namespace Tests
                 "Not Serialized, does not contain player_identifier property");
             Assert.IsTrue(serializedJson.Contains("uuid-11223344"),
                 "Not Serialized, does not contain player_identifier value");
+        }
+
+        public class ConditionalSerialization
+        {
+
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+            [JsonProperty("Prop1")]
+#else
+            [Json(Name = "Prop1")]
+#endif
+            public string AttributeRenamedProperty { get; set; } = "Hello";
+#if LOOTLOCKER_USE_NEWTONSOFTJSON
+            [JsonIgnore]
+#else
+            [Json(IgnoreWhenSerializing = true, IgnoreWhenDeserializing = true)]
+#endif
+            public string IgnoredProperty { get; set; } = "ignored";
+            public bool Completed { get; set; } = false;
+            public int NormalProperty { get; set; } = 1234;
+
+            public bool ShouldSerializeCompleted()
+            {
+                // don't serialize the Completed property if it is not set.
+                return Completed;
+            }
+        }
+
+        [Test]
+        public void SDKCanHandleConditionalSerialization()
+        {
+            // Given
+            ConditionalSerialization conditionalSerialization = new ConditionalSerialization();
+
+            // When
+            string serializedJson = LootLockerJson.SerializeObject(conditionalSerialization);
+            Debug.Log(serializedJson);
+            // Then
+            Assert.NotNull(serializedJson, "Not serialized, is null");
+            Assert.AreNotEqual("{}", serializedJson, "Not serialized, empty");
+            Assert.IsFalse(serializedJson.Contains("ignored_property"),
+                "Not Serialized correctly, contains IgnoredProperty property");
+            Assert.IsFalse(serializedJson.Contains("ignored"),
+                "Not Serialized correctly, contains ignored value");
+            Assert.IsTrue(serializedJson.Contains("prop_1") || serializedJson.Contains("Prop1") /*For some reason Newtonsoft fails to snake case this one*/,
+                "Not Serialized correctly, does not contain Prop1 property");
+            Assert.IsTrue(serializedJson.Contains("Hello"),
+                "Not Serialized correctly, does not contain Prop1 value");
+            Assert.IsFalse(serializedJson.Contains("attribute_renamed_property"),
+                "Not Serialized correctly, contains AttributeRenamedProperty property");
+            Assert.IsFalse(serializedJson.Contains("completed"),
+                "Not Serialized correctly, contains Completed property");
+            Assert.IsFalse(serializedJson.Contains("false"),
+                "Not Serialized correctly, contains Completed value");
+            Assert.IsTrue(serializedJson.Contains("normal_property"),
+                "Not Serialized correctly, does not contain NormalProperty property");
+            Assert.IsTrue(serializedJson.Contains("1234"),
+                "Not Serialized correctly, does not contain NormalProperty value");
+
+            // Then Given
+            conditionalSerialization.Completed = true;
+
+            // When
+            serializedJson = LootLockerJson.SerializeObject(conditionalSerialization);
+            
+            // Then
+            Assert.NotNull(serializedJson, "Not serialized, is null");
+            Assert.AreNotEqual("{}", serializedJson, "Not serialized, empty");
+            Assert.IsFalse(serializedJson.Contains("ignored_property"),
+                "Not Serialized correctly, contains IgnoredProperty property");
+            Assert.IsFalse(serializedJson.Contains("ignored"),
+                "Not Serialized correctly, contains ignored value");
+            Assert.IsTrue(serializedJson.Contains("prop_1") || serializedJson.Contains("Prop1") /*For some reason Newtonsoft fails to snake case this one*/,
+                "Not Serialized correctly, does not contain prop_1 property");
+            Assert.IsTrue(serializedJson.Contains("Hello"),
+                "Not Serialized correctly, does not contain prop_1 value");
+            Assert.IsFalse(serializedJson.Contains("attribute_renamed_property"),
+                "Not Serialized correctly, contains AttributeRenamedProperty property");
+            Assert.IsTrue(serializedJson.Contains("completed"),
+                "Not Serialized correctly, does not contain Completed property");
+            Assert.IsTrue(serializedJson.Contains("true"),
+                "Not Serialized correctly, does not contain Completed value");
+            Assert.IsTrue(serializedJson.Contains("normal_property"),
+                "Not Serialized correctly, does not contain NormalProperty property");
+            Assert.IsTrue(serializedJson.Contains("1234"),
+                "Not Serialized correctly, does not contain NormalProperty value");
+        }
+
+        public class CaseVariationClass
+        {
+            public string normalCamelCase { get; set; } = "n/a";
+            public string PascalCase { get; set; } = "n/a";
+            public string SCREAMINGCASE { get; set; } = "n/a";
+            public string Upper_Snake_Case { get; set; } = "n/a";
+            public string lower_snake_case { get; set; } = "n/a";
+            public string number79CamelCase { get; set; } = "n/a";
+            public string CamelCase69 { get; set; } = "n/a";
+            public string MultiLetterISAok { get; set; } = "n/a";
+        };
+
+        [Test]
+        public void JsonSerializationConvertsToSnakeCase()
+        {
+            // Given
+            CaseVariationClass caseVariationClass = new CaseVariationClass();
+
+            // When
+            string serializedJson = LootLockerJson.SerializeObject(caseVariationClass);
+
+            // Then
+            Assert.IsTrue(serializedJson.Contains("normal_camel_case"), "Field normalCamelCase was not serialized correctly, json: " + serializedJson);
+            Assert.IsTrue(serializedJson.Contains("pascal_case"), "Field PascalCase was not serialized correctly, json: " + serializedJson);
+            Assert.IsTrue(serializedJson.Contains("screamingcase"), "Field SCREAMINGCASE was not serialized correctly, json: " + serializedJson);
+            Assert.IsTrue(serializedJson.Contains("upper_snake_case"), "Field Upper_Snake_Case was not serialized correctly, json: " + serializedJson);
+            Assert.IsTrue(serializedJson.Contains("lower_snake_case"), "Field lower_snake_case was not serialized correctly, json: " + serializedJson);
+#if !LOOTLOCKER_USE_NEWTONSOFTJSON
+            // I don't agree with how newtonsoft serializes these fields
+            Assert.IsTrue(serializedJson.Contains("number_79_camel_case"), "Field number79CamelCase was not serialized correctly, json: " + serializedJson);
+            Assert.IsTrue(serializedJson.Contains("camel_case_69"), "Field CamelCase69 was not serialized correctly, json: " + serializedJson);
+            Assert.IsTrue(serializedJson.Contains("multi_letter_isa_ok"), "Field MultiLetterISAok was not serialized correctly, json: " + serializedJson);
+#endif
+        }
+
+        [Test]
+        public void JsonDeserializationConvertsFromSnakeCase()
+        {
+            // Given
+            string caseVariationClassJson =
+                "{\"normal_camel_case\":\"1234\",\"pascal_case\":\"1234\",\"screamingcase\":\"1234\",\"upper_snake_case\":\"1234\",\"lower_snake_case\":\"1234\",\"number_79_camel_case\":\"1234\",\"camel_case_69\":\"1234\",\"multi_letter_isa_ok\":\"1234\"}";
+
+            // When
+            CaseVariationClass caseVariationClass =
+                LootLockerJson.DeserializeObject<CaseVariationClass>(caseVariationClassJson);
+
+            // Then
+            Assert.AreEqual("1234", caseVariationClass.normalCamelCase, "Field: " + nameof(caseVariationClass.normalCamelCase));
+            Assert.AreEqual("1234", caseVariationClass.PascalCase, "Field: " + nameof(caseVariationClass.PascalCase));
+            Assert.AreEqual("1234", caseVariationClass.SCREAMINGCASE, "Field: " + nameof(caseVariationClass.SCREAMINGCASE));
+            Assert.AreEqual("1234", caseVariationClass.Upper_Snake_Case, "Field: " + nameof(caseVariationClass.Upper_Snake_Case));
+            Assert.AreEqual("1234", caseVariationClass.lower_snake_case, "Field: " + nameof(caseVariationClass.lower_snake_case));
+#if !LOOTLOCKER_USE_NEWTONSOFTJSON
+            // I don't agree with how newtonsoft deserializes these fields
+            Assert.AreEqual("1234", caseVariationClass.number79CamelCase, "Field: " + nameof(caseVariationClass.number79CamelCase));
+            Assert.AreEqual("1234", caseVariationClass.CamelCase69, "Field: " + nameof(caseVariationClass.CamelCase69));
+            Assert.AreEqual("1234", caseVariationClass.MultiLetterISAok, "Field: " + nameof(caseVariationClass.MultiLetterISAok));
+#endif
         }
 
 #if !LOOTLOCKER_USE_NEWTONSOFTJSON
@@ -225,7 +375,7 @@ namespace Tests
             var persons = new Person[] { person, person };
             var options = new CustomOptions();
             var json = Json.Serialize(persons, options);
-            Assert.IsTrue(json == "[{\"Name\":\"héllo\"},{\"Name\":\"héllo\"}]");
+            Assert.IsTrue(json == "[{\"name\":\"héllo\"},{\"name\":\"héllo\"}]");
         }
     }
 
